@@ -1,0 +1,14 @@
+{
+  "name": "@codexporer.io/expo-multistring-input",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "peerDependencies": {
+    "react": "*",
+    "react-native-paper": "*",
+    "lodash": "*",
+    "uuid": "*",
+    "@codexporer.io/expo-picker": "*",
+    "styled-components": "*",
+    "@expo/vector-icons": "*"
+  }
+}

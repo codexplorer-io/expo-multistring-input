@@ -6,9 +6,10 @@ import React, {
 import map from 'lodash/map';
 import isEqual from 'lodash/isEqual';
 import filter from 'lodash/filter';
+import find from 'lodash/find';
 import noop from 'lodash/noop';
 import reverse from 'lodash/reverse';
-import { useTheme } from 'react-native-paper';
+import { useTheme, Button } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 import { usePicker } from '@codexporer.io/expo-picker';
 import { CreateValue } from './create-value';
@@ -41,6 +42,9 @@ export const useMultiStringInput = ({
     placeholder = initalParams.placeholder,
     addValueLabel = initalParams.addValueLabel,
     addValuePlaholder = initalParams.addValuePlaholder,
+    getValue = value => value,
+    createValue = value => value,
+    renderBeforeOptionContent,
     onOpen,
     onAdd,
     onDelete
@@ -64,7 +68,14 @@ export const useMultiStringInput = ({
         const deleteValue = () => onValueDelete(option);
         return (
             <>
-                {renderLabel()}
+                {
+                    renderBeforeOptionContent?.({
+                        value: find(values, val => val === option),
+                        values,
+                        setValues
+                    }) ?? null
+                }
+                {renderLabel(getValue(option))}
                 <Actions>
                     <Delete
                         icon='delete'
@@ -77,14 +88,15 @@ export const useMultiStringInput = ({
     };
 
     const onValueCreate = value => {
-        const nextValues = [...values, value];
+        const newValue = createValue(value);
+        const nextValues = [...values, newValue];
         setValues(nextValues);
-        onAdd?.({ value, values: nextValues });
+        onAdd?.({ value: newValue, values: nextValues });
     };
 
     const renderBottomView = () => (
         <CreateValue
-            values={values}
+            values={map(values, getValue)}
             onCreate={onValueCreate}
             label={addValueLabel}
             placeholder={addValuePlaholder}
@@ -149,10 +161,10 @@ export const useMultiStringInput = ({
                             values,
                             value => (
                                 <ValueItem
-                                    key={value}
+                                    key={getValue(value)}
                                     mode='outlined'
                                 >
-                                    {value}
+                                    {getValue(value)}
                                 </ValueItem>
                             )
                         )}
@@ -167,8 +179,19 @@ export const useMultiStringInput = ({
         </Root>
     );
 
+    const renderButtonInput = () => (
+        <Button
+            underlayColor='transparent'
+            onPress={openValuesPicker}
+            mode='contained'
+        >
+            {label}
+        </Button>
+    );
+
     return {
         values,
-        renderValuesInput
+        renderValuesInput,
+        renderButtonInput
     };
 };

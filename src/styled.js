@@ -20,6 +20,7 @@ export const Root = styled.TouchableHighlight`
     padding-left: 5px;
     padding-right: 5px;
     background-color: ${({ theme: { colors: { background } } }) => background};
+    opacity: ${({ isDisabled }) => isDisabled ? 0.5 : 1};
     min-height: 50px;
     align-items: center;
 `;

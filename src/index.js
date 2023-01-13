@@ -44,6 +44,7 @@ export const useMultiStringInput = ({
     addValuePlaholder = initalParams.addValuePlaholder,
     getValue = value => value,
     createValue = value => value,
+    isDisabled = false,
     renderBeforeOptionContent,
     onOpen,
     onAdd,
@@ -151,7 +152,8 @@ export const useMultiStringInput = ({
     const renderValuesInput = () => (
         <Root
             underlayColor='transparent'
-            onPress={openValuesPicker}
+            onPress={isDisabled ? null : openValuesPicker}
+            isDisabled={isDisabled}
         >
             <>
                 <Label>{label}</Label>
@@ -184,6 +186,7 @@ export const useMultiStringInput = ({
             underlayColor='transparent'
             onPress={openValuesPicker}
             mode='contained'
+            disabled={isDisabled}
         >
             {label}
         </Button>
@@ -191,6 +194,7 @@ export const useMultiStringInput = ({
 
     return {
         values,
+        setValues,
         renderValuesInput,
         renderButtonInput
     };

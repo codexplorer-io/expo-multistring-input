@@ -22,8 +22,10 @@ import {
     ValueItem,
     Placeholder,
     Label,
-    Actions,
-    Delete
+    OptionContent,
+    OptionValueDisplay,
+    OptionActions,
+    OptionDeleteAction
 } from './styled';
 
 const initalParams = {
@@ -32,7 +34,9 @@ const initalParams = {
     label: 'Values',
     placeholder: 'Tap to add',
     addValueLabel: 'Value',
-    addValuePlaholder: 'Input value'
+    addValuePlaholder: 'Input value',
+    addDisplayValueLabel: 'Display Value',
+    addDisplayValuePlaholder: 'Input display value'
 };
 
 export const useMultiStringInput = ({
@@ -42,9 +46,12 @@ export const useMultiStringInput = ({
     placeholder = initalParams.placeholder,
     addValueLabel = initalParams.addValueLabel,
     addValuePlaholder = initalParams.addValuePlaholder,
-    getValue = value => value,
+    addDisplayValueLabel = initalParams.addDisplayValueLabel,
+    addDisplayValuePlaholder = initalParams.addDisplayValuePlaholder,
+    getValue = option => option,
     createValue = value => value,
     isDisabled = false,
+    getDisplayValue,
     renderBeforeOptionContent,
     onOpen,
     onAdd,
@@ -55,6 +62,8 @@ export const useMultiStringInput = ({
     const [{ pickerConfig }, { openPicker, changeConfig }] = usePicker();
     const createPickerConfig = useRef();
     const [values, setValues] = useState(initialValues);
+    const hasDisplayValue = !!getDisplayValue;
+    const getCurrentDisplayValue = hasDisplayValue ? getDisplayValue : getValue;
 
     const onValueDelete = value => {
         const nextValues = filter(values, val => val !== value);
@@ -76,14 +85,21 @@ export const useMultiStringInput = ({
                         setValues
                     }) ?? null
                 }
-                {renderLabel(getValue(option))}
-                <Actions>
-                    <Delete
+                <OptionContent>
+                    {renderLabel(getCurrentDisplayValue(option))}
+                    {hasDisplayValue && (
+                        <OptionValueDisplay numberOfLines={1}>
+                            {getValue(option)}
+                        </OptionValueDisplay>
+                    )}
+                </OptionContent>
+                <OptionActions>
+                    <OptionDeleteAction
                         icon='delete'
                         onPress={deleteValue}
                         color={theme.colors.primary}
                     />
-                </Actions>
+                </OptionActions>
             </>
         );
     };
@@ -97,10 +113,14 @@ export const useMultiStringInput = ({
 
     const renderBottomView = () => (
         <CreateValue
-            values={map(values, getValue)}
+            values={values}
+            getValue={getValue}
+            hasDisplayValue={hasDisplayValue}
             onCreate={onValueCreate}
             label={addValueLabel}
             placeholder={addValuePlaholder}
+            displayValueLabel={addDisplayValueLabel}
+            displayValuePlaceholder={addDisplayValuePlaholder}
         />
     );
 
@@ -166,7 +186,7 @@ export const useMultiStringInput = ({
                                     key={getValue(value)}
                                     mode='outlined'
                                 >
-                                    {getValue(value)}
+                                    {getCurrentDisplayValue(value)}
                                 </ValueItem>
                             )
                         )}

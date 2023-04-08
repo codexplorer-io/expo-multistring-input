@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, TextInput } from 'react-native-paper';
 import includes from 'lodash/includes';
+import map from 'lodash/map';
 import {
     CreateValueRoot,
     CreateValueElementsSpacer,
@@ -11,12 +12,17 @@ import {
 
 export const CreateValue = ({
     values,
+    getValue,
+    hasDisplayValue,
     label,
     placeholder,
+    displayValueLabel,
+    displayValuePlaceholder,
     onCreate
 }) => {
     const [isAdding, setIsAdding] = useState(false);
     const [value, setValue] = useState();
+    const [displayValue, setDisplayValue] = useState();
 
     const onStartAdding = () => {
         setValue('');
@@ -28,11 +34,13 @@ export const CreateValue = ({
     };
 
     const onCreatePress = async () => {
-        onCreate(value);
+        onCreate(hasDisplayValue ? { value, displayValue } : value);
         setValue('');
+        setDisplayValue('');
     };
 
-    const isValid = !!value && !includes(values, value);
+    const isValueValid = !!value && !includes(map(values, getValue), value);
+    const isDisplayValueValid = !hasDisplayValue || !!displayValue;
 
     return (
         <CreateValueRoot>
@@ -46,13 +54,23 @@ export const CreateValue = ({
             )}
             {isAdding && (
                 <>
+                    {hasDisplayValue && (
+                        <TextInput
+                            label={displayValueLabel}
+                            placeholder={displayValuePlaceholder}
+                            value={displayValue}
+                            onChangeText={setDisplayValue}
+                            mode='outlined'
+                            error={!isDisplayValueValid}
+                        />
+                    )}
                     <TextInput
                         label={label}
                         placeholder={placeholder}
                         value={value}
                         onChangeText={setValue}
                         mode='outlined'
-                        error={!isValid}
+                        error={!isValueValid}
                     />
                     <CreateValueElementsSpacer />
                     <CreateValueButtons>
@@ -66,7 +84,7 @@ export const CreateValue = ({
                         <CreateValueButton
                             mode='contained'
                             onPress={onCreatePress}
-                            disabled={!isValid}
+                            disabled={!isValueValid || !isDisplayValueValid}
                         >
                             Add
                         </CreateValueButton>

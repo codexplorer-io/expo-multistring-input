@@ -5,7 +5,8 @@ import {
     Surface,
     Button,
     IconButton,
-    Subheading
+    Subheading,
+    Caption
 } from 'react-native-paper';
 import { Feather } from '@expo/vector-icons';
 
@@ -82,14 +83,21 @@ export const Label = styled(Text)`
     background-color: ${({ theme: { colors: { background } } }) => background};
 `;
 
-export const Actions = styled.View`
+export const OptionContent = styled.View`
     flex: 1;
+    display: flex;
+    flex-direction: column;
+`;
+
+export const OptionValueDisplay = styled(Caption)``;
+
+export const OptionActions = styled.View`
     display: flex;
     margin-right: auto;
     align-items: flex-end;
 `;
 
-export const Delete = styled(IconButton)``;
+export const OptionDeleteAction = styled(IconButton)``;
 
 export const CreateValueRoot = styled(Surface)`
     elevation: 8;

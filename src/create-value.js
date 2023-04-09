@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import React, {
+    useRef,
+    useState,
+    useEffect
+} from 'react';
 import { Button, TextInput } from 'react-native-paper';
 import includes from 'lodash/includes';
 import map from 'lodash/map';
@@ -12,13 +16,16 @@ import {
 
 export const CreateValue = ({
     values,
+    editingValue,
     getValue,
+    getDisplayValue,
     hasDisplayValue,
     label,
     placeholder,
     displayValueLabel,
     displayValuePlaceholder,
-    onCreate
+    onCreate,
+    onEditingDismiss
 }) => {
     const [isAdding, setIsAdding] = useState(false);
     const [value, setValue] = useState();
@@ -26,11 +33,14 @@ export const CreateValue = ({
 
     const onStartAdding = () => {
         setValue('');
+        setDisplayValue('');
         setIsAdding(true);
+        onEditingDismiss();
     };
 
     const onCancel = () => {
         setIsAdding(false);
+        onEditingDismiss();
     };
 
     const onCreatePress = async () => {
@@ -39,8 +49,32 @@ export const CreateValue = ({
         setDisplayValue('');
     };
 
-    const isValueValid = !!value && !includes(map(values, getValue), value);
+    const isValueValid = !!value && (
+        !includes(map(values, getValue), value) ||
+        editingValue && value === getValue(editingValue)
+    );
     const isDisplayValueValid = !hasDisplayValue || !!displayValue;
+
+    const effectDeps = useRef();
+    effectDeps.current = {
+        getValue,
+        getDisplayValue,
+        hasDisplayValue
+    };
+    useEffect(() => {
+        if (!editingValue) {
+            return;
+        }
+
+        const {
+            getValue,
+            getDisplayValue,
+            hasDisplayValue
+        } = effectDeps.current;
+        setValue(getValue(editingValue));
+        hasDisplayValue && setDisplayValue(getDisplayValue(editingValue));
+        setIsAdding(true);
+    }, [editingValue]);
 
     return (
         <CreateValueRoot>
@@ -86,7 +120,7 @@ export const CreateValue = ({
                             onPress={onCreatePress}
                             disabled={!isValueValid || !isDisplayValueValid}
                         >
-                            Add
+                            {editingValue ? 'Save' : 'Add'}
                         </CreateValueButton>
                     </CreateValueButtons>
                 </>

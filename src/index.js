@@ -9,9 +9,11 @@ import filter from 'lodash/filter';
 import find from 'lodash/find';
 import noop from 'lodash/noop';
 import reverse from 'lodash/reverse';
+import indexOf from 'lodash/indexOf';
 import { useTheme, Button } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 import { usePicker } from '@codexporer.io/expo-picker';
+import { usePrevious } from '@codexporer.io/react-hooks';
 import { CreateValue } from './create-value';
 import {
     Root,
@@ -25,7 +27,7 @@ import {
     OptionContent,
     OptionValueDisplay,
     OptionActions,
-    OptionDeleteAction
+    OptionAction
 } from './styled';
 
 const initalParams = {
@@ -55,6 +57,7 @@ export const useMultiStringInput = ({
     renderBeforeOptionContent,
     onOpen,
     onAdd,
+    onEdit,
     onDelete
 } = initalParams) => {
     const theme = useTheme();
@@ -62,6 +65,7 @@ export const useMultiStringInput = ({
     const [{ pickerConfig }, { openPicker, changeConfig }] = usePicker();
     const createPickerConfig = useRef();
     const [values, setValues] = useState(initialValues);
+    const [editingValue, setEditingValue] = useState(null);
     const hasDisplayValue = !!getDisplayValue;
     const getCurrentDisplayValue = hasDisplayValue ? getDisplayValue : getValue;
 
@@ -71,11 +75,16 @@ export const useMultiStringInput = ({
         onDelete?.({ value, values: nextValues });
     };
 
+    const onValueEdit = value => {
+        setEditingValue(value);
+    };
+
     const renderOptionContent = ({
         option,
         renderLabel
     }) => {
         const deleteValue = () => onValueDelete(option);
+        const editValue = () => onValueEdit(option);
         return (
             <>
                 {
@@ -94,7 +103,12 @@ export const useMultiStringInput = ({
                     )}
                 </OptionContent>
                 <OptionActions>
-                    <OptionDeleteAction
+                    <OptionAction
+                        icon='pencil'
+                        onPress={editValue}
+                        color={theme.colors.primary}
+                    />
+                    <OptionAction
                         icon='delete'
                         onPress={deleteValue}
                         color={theme.colors.primary}
@@ -104,7 +118,20 @@ export const useMultiStringInput = ({
         );
     };
 
+    const onEditingDismiss = () => {
+        setEditingValue(null);
+    };
+
     const onValueCreate = value => {
+        if (editingValue) {
+            const newValue = createValue(value);
+            values[indexOf(values, editingValue)] = newValue;
+            const nextValues = [...values];
+            onEdit?.({ value: newValue, values: nextValues });
+            onEditingDismiss();
+            return;
+        }
+
         const newValue = createValue(value);
         const nextValues = [...values, newValue];
         setValues(nextValues);
@@ -114,9 +141,12 @@ export const useMultiStringInput = ({
     const renderBottomView = () => (
         <CreateValue
             values={values}
+            editingValue={editingValue}
             getValue={getValue}
+            getDisplayValue={getCurrentDisplayValue}
             hasDisplayValue={hasDisplayValue}
             onCreate={onValueCreate}
+            onEditingDismiss={onEditingDismiss}
             label={addValueLabel}
             placeholder={addValuePlaholder}
             displayValueLabel={addDisplayValueLabel}
@@ -152,19 +182,31 @@ export const useMultiStringInput = ({
         renderBottomView
     };
 
+    const previousEditingValue = usePrevious(editingValue);
     useEffect(() => {
         if (!values ||
             !pickerConfig ||
             pickerConfig.pickerId !== pickerId ||
-            isEqual(pickerConfig.items, createPickerConfig.current.items)
+            (
+                isEqual(pickerConfig.items, createPickerConfig.current.items) &&
+                isEqual(editingValue, previousEditingValue)
+            )
         ) {
             return;
         }
 
         changeConfig(createPickerConfig.current);
-    }, [changeConfig, pickerConfig, pickerId, values]);
+    }, [
+        changeConfig,
+        pickerConfig,
+        pickerId,
+        values,
+        previousEditingValue,
+        editingValue
+    ]);
 
     const openValuesPicker = () => {
+        onEditingDismiss();
         openPicker(createPickerConfig.current);
         onOpen?.();
     };

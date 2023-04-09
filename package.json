@@ -8,6 +8,7 @@
     "lodash": "*",
     "uuid": "*",
     "@codexporer.io/expo-picker": "*",
+    "@codexporer.io/react-hooks": "*",
     "styled-components": "*",
     "@expo/vector-icons": "*"
   }

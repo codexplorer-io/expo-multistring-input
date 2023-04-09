@@ -93,11 +93,12 @@ export const OptionValueDisplay = styled(Caption)``;
 
 export const OptionActions = styled.View`
     display: flex;
+    flex-direction: row;
     margin-right: auto;
     align-items: flex-end;
 `;
 
-export const OptionDeleteAction = styled(IconButton)``;
+export const OptionAction = styled(IconButton)``;
 
 export const CreateValueRoot = styled(Surface)`
     elevation: 8;

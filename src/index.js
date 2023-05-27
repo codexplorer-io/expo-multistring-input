@@ -211,37 +211,40 @@ export const useMultiStringInput = ({
         onOpen?.();
     };
 
-    const renderValuesInput = () => (
-        <Root
-            underlayColor='transparent'
-            onPress={isDisabled ? null : openValuesPicker}
-            isDisabled={isDisabled}
-        >
-            <>
-                <Label>{label}</Label>
-                {values.length > 0 && (
-                    <Value>
-                        {map(
-                            values,
-                            value => (
-                                <ValueItem
-                                    key={getValue(value)}
-                                    mode='outlined'
-                                >
-                                    {getCurrentDisplayValue(value)}
-                                </ValueItem>
-                            )
-                        )}
-                    </Value>
-                )}
-                {values.length === 0 && (
-                    <Placeholder>
-                        {placeholder}
-                    </Placeholder>
-                )}
-            </>
-        </Root>
-    );
+    const renderValuesInput = ({ values: overiddenValues } = {}) => {
+        const currentValues = overiddenValues ?? values;
+        return (
+            <Root
+                underlayColor='transparent'
+                onPress={isDisabled ? null : openValuesPicker}
+                isDisabled={isDisabled}
+            >
+                <>
+                    <Label>{label}</Label>
+                    {currentValues.length > 0 && (
+                        <Value>
+                            {map(
+                                currentValues,
+                                value => (
+                                    <ValueItem
+                                        key={getValue(value)}
+                                        mode='outlined'
+                                    >
+                                        {getCurrentDisplayValue(value)}
+                                    </ValueItem>
+                                )
+                            )}
+                        </Value>
+                    )}
+                    {currentValues.length === 0 && (
+                        <Placeholder>
+                            {placeholder}
+                        </Placeholder>
+                    )}
+                </>
+            </Root>
+        );
+    };
 
     const renderButtonInput = () => (
         <Button

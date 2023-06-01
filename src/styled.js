@@ -14,7 +14,7 @@ export const Root = styled.TouchableHighlight`
     border-radius: ${({ theme: { roundness } }) => roundness}px;
     border-width: 1px;
     border-bottom-width: 1px;
-    border-color: ${({ theme: { colors: { placeholder } } }) => placeholder};
+    border-color: ${({ theme, isError }) => isError ? theme.colors.error : theme.colors.placeholder};
     display: flex;
     flex-direction: row;
     margin-top: 5px;
@@ -61,7 +61,7 @@ export const ValueItem = styled(Chip)`
 `;
 
 export const Placeholder = styled(Text)`
-    color: ${({ theme: { colors: { placeholder } } }) => placeholder};
+    color: ${({ theme, isError }) => isError ? theme.colors.error : theme.colors.placeholder};
     flex: 1;
     padding-left: 8px;
     padding-right: 8px;
@@ -70,7 +70,7 @@ export const Placeholder = styled(Text)`
 `;
 
 export const Label = styled(Text)`
-    color: ${({ theme: { colors: { placeholder } } }) => placeholder};
+    color: ${({ theme, isError }) => isError ? theme.colors.error : theme.colors.placeholder};
     position: absolute;
     font-size: 12px;
     line-height: 12px;

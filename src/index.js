@@ -5,6 +5,7 @@ import React, {
 } from 'react';
 import map from 'lodash/map';
 import isEqual from 'lodash/isEqual';
+import isEmpty from 'lodash/isEmpty';
 import filter from 'lodash/filter';
 import find from 'lodash/find';
 import noop from 'lodash/noop';
@@ -53,6 +54,7 @@ export const useMultiStringInput = ({
     getValue = option => option,
     createValue = value => value,
     isDisabled = false,
+    isRequired = false,
     getDisplayValue,
     renderBeforeOptionContent,
     onOpen,
@@ -213,14 +215,16 @@ export const useMultiStringInput = ({
 
     const renderValuesInput = ({ values: overiddenValues } = {}) => {
         const currentValues = overiddenValues ?? values;
+        const isError = !isDisabled && isRequired && isEmpty(currentValues);
         return (
             <Root
                 underlayColor='transparent'
                 onPress={isDisabled ? null : openValuesPicker}
                 isDisabled={isDisabled}
+                isError={isError}
             >
                 <>
-                    <Label>{label}</Label>
+                    <Label isError={isError}>{label}</Label>
                     {currentValues.length > 0 && (
                         <Value>
                             {map(
@@ -237,7 +241,7 @@ export const useMultiStringInput = ({
                         </Value>
                     )}
                     {currentValues.length === 0 && (
-                        <Placeholder>
+                        <Placeholder isError={isError}>
                             {placeholder}
                         </Placeholder>
                     )}

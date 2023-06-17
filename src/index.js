@@ -264,6 +264,7 @@ export const useMultiStringInput = ({
     return {
         values,
         setValues,
+        openValuesPicker,
         renderValuesInput,
         renderButtonInput
     };

@@ -60,11 +60,13 @@ export const useMultiStringInput = ({
     onOpen,
     onAdd,
     onEdit,
-    onDelete
+    onDelete,
+    onBeforeClose,
+    onConfirm
 } = initalParams) => {
     const theme = useTheme();
     const [pickerId] = useState(uuid());
-    const [{ pickerConfig }, { openPicker, changeConfig }] = usePicker();
+    const [{ pickerConfig }, { openPicker, changeConfig, closePicker }] = usePicker();
     const createPickerConfig = useRef();
     const [values, setValues] = useState(initialValues);
     const [editingValue, setEditingValue] = useState(null);
@@ -181,7 +183,9 @@ export const useMultiStringInput = ({
         onValuesChange: noop,
         renderOptionContent,
         renderEmptyView,
-        renderBottomView
+        renderBottomView,
+        onBeforeClose,
+        onConfirm
     };
 
     const previousEditingValue = usePrevious(editingValue);
@@ -265,6 +269,7 @@ export const useMultiStringInput = ({
         values,
         setValues,
         openValuesPicker,
+        closeValuesPicker: closePicker,
         renderValuesInput,
         renderButtonInput
     };
